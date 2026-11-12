@@ -21,7 +21,7 @@ being transcribed while Topic 2 is being taught.
 ## Setup
 1. `py -m pip install -r requirements.txt`
 2. `ollama pull qwen2.5:3b`
-3. `py -m streamlit run app.py` -> opens at htpp://localhost:8501
+3. `py -m streamlit run app.py` -> opens at http://localhost:8501
 
 ## Notes
 - recordings/ and notes/ are gitignored: private class content
