@@ -1,0 +1,6 @@
+stereamlit
+sounddevice
+soundfile
+numpy
+openai-whisper
+requests
