@@ -90,31 +90,35 @@ if "last_text" not in st.session_state:
 if "last_summary" not in st.session_state:
     st.session_state.last_summary = None
 
-col1, col2 = st.columns(2)
 
-# disabled= makes the impossible clicks grey: you can't Start twice,
-# you can't Stop before Starting
-if col1.button("Start recording", disabled=st.session_state.recorder is not None):
-    st.session_state.recorder = Recorder()
-    st.session_state.recorder.start()
-    st.success("Recording... press Stop when the topic ends.")
-
-if col2.button("Stop recording", disabled=st.session_state.recorder is None):
-    path = os.path.join(RECORDINGS, f"topic_{int(st.session_state.get('n', 0)) + 1:02d}.wav")
-    seconds = st.session_state.recorder.stop(path)
-    st.session_state.recorder = None
-    st.session_state.last_clip = path
-    st.session_state.n = st.session_state.get("n", 0) + 1
-    st.info(f"Saved {seconds:.1f}s to {os.path.basename(path)}")
-    with st.spinner("Transcribing... (CPU, this can take a moment)"):
-        st.session_state.last_text = transcribe_chinese(path)
-    with st.spinner("Summarizing into notes..."):
-        st.session_state.last_summary = summarize_chinese(st.session_state.last_text)
-    note_path = os.path.join(NOTES, f"topic_{st.session_state.n:02d}.md")
-    with open(note_path, "w", encoding="utf-8") as f:
-        f.write(f"# Topic {st.session_state.n}\n\n")
-        f.write("## Transcript\n\n" + st.session_state.last_text + "\n\n")
-        f.write("## Summary\n\n" + st.session_state.last_summary + "\n")
+if st.session_state.recorder is None:
+    if st.button("Start recording", use_container_width=True):
+        st.session_state.recorder = Recorder()
+        st.session_state.recorder.start()
+        st.rerun()
+else:
+    st.markdown(
+        "<style>div[data-testid='stButton'] button "
+        "{background-color:#d32f2f; color:white; font-weight:bold;}</style>",
+        unsafe_allow_html=True,
+    )
+    if st.button("■ STOP RECORDING", use_container_width=True):
+        path = os.path.join(RECORDINGS, f"topic_{int(st.session_state.get('n', 0)) + 1:02d}.wav")
+        seconds = st.session_state.recorder.stop(path)
+        st.session_state.recorder = None
+        st.session_state.last_clip = path
+        st.session_state.n = st.session_state.get("n", 0) + 1
+        st.session_state.pending_path = path
+        st.info(f"Saved {seconds:.1f}s to {os.path.basename(path)}")
+    if st.session_state.get("pending_path"):
+        pending = st.session_state.pop("pending_path")
+        with st.spinner("Transcribing... (CPU, this can take a moment)"):
+            st.session_state.last_text = transcribe_chinese(path)
+            note_path = os.path.join(NOTES, f"topic_{st.session_state.n:02d}.md")
+            with open(note_path, "w", encoding="utf-8") as f:
+                f.write(f"# Topic {st.session_state.n}\n\n")
+                f.write("## Transcript\n\n" + st.session_state.last_text + "\n\n")
+        st.rerun()
         
 # Playback so you can verify mic actually captured the topic
 if st.session_state.last_clip:

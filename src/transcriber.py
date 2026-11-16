@@ -25,5 +25,12 @@ def load_model():
 def transcribe_chinese(path):
     """Return the Chinese transcript of an audio file."""
     model = load_model()
-    result = model.transcribe(path, language="zh")
+    result = model.transcribe(
+        path,
+        language="zh",
+        beam_size=1,                        # greedy decoding: ~2-3x faster than
+                                            # the default beam search, tiny quality loss
+        condition_on_previous_text=False    # IMPORTANT for classrooms: without this,
+                                            # whisper loops/repeats text during silences
+    )
     return result["text"].strip()
