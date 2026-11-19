@@ -1,6 +1,7 @@
-stereamlit
+streamlit
 sounddevice
 soundfile
 numpy
-openai-whisper
+faster-whisper
 requests
+av==18.1.0

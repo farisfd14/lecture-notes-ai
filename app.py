@@ -33,7 +33,6 @@ sys.path.insert(0, os.path.join(PROJECT_ROOT, "src"))
 
 # 3. Only THEN: import our own modules (they need step 2 to work)
 from transcriber import transcribe_chinese
-from summarizer import summarize_chinese
 
 # 4. Constants that use PROJECT_ROOT
 SAMPLE_RATE = 16000
@@ -113,7 +112,7 @@ else:
     if st.session_state.get("pending_path"):
         pending = st.session_state.pop("pending_path")
         with st.spinner("Transcribing... (CPU, this can take a moment)"):
-            st.session_state.last_text = transcribe_chinese(path)
+            st.session_state.last_text = transcribe_chinese(pending)
             note_path = os.path.join(NOTES, f"topic_{st.session_state.n:02d}.md")
             with open(note_path, "w", encoding="utf-8") as f:
                 f.write(f"# Topic {st.session_state.n}\n\n")
